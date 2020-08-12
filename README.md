@@ -1,6 +1,6 @@
-# CDCS Docker
+# WIPP-Registry Docker
 
-This repository contains `docker-compose` files to build and deploy CDCS containers.
+This repository contains `docker-compose` files to build and deploy CDCS containers, with custom settings for the [WIPP-Registry project](https://github.com/usnistgov/WIPP-Registry.git).
 
 ## Prerequisites
 
@@ -22,9 +22,9 @@ Below is the list of environment variables to set and their description.
 
 | Variable | Description |
 | ----------- | ----------- |
-| PROJECT_NAME          | Name of the CDCS image to build (e.g. mdcs, nmrr) |
-| PROJECT_VERSION       | Name of the tag to build (e.g. latest, 2.10.0) |
-| CDCS_REPO             | URL of the CDCS repository to clone to build the image (e.g. https://github.com/usnistgov/mdcs.git) |
+| PROJECT_NAME          | Name of the Docker image to build |
+| PROJECT_VERSION       | Name of the Docker tag to build (e.g. latest, 2.10.0) |
+| CDCS_REPO             | URL of the CDCS-based repository to clone to build the image (e.g. https://github.com/usnistgov/WIPP-Registry.git) |
 | BRANCH                | Branch/Tag of the repository to pull to build the image (e.g. master, 2.10.0) |
 | PIP_CONF              | Pip configuration file to use to build the image |
 | PYTHON_VERSION        | Version of the Python image to use as a base image for the CDCS image |
@@ -38,7 +38,7 @@ $ docker-compose build --no-cache
 
 
 
-## Deploy a CDCS
+## Deploy a CDCS/WIPP-Registry
 
 ### 1. Customize the deployment
 
@@ -53,8 +53,8 @@ Commented variables in the `.env` need to be uncommented and filled.
 
 | Variable | Description |
 | ----------- | ----------- |
-| PROJECT_NAME          | Name of the CDCS image to deploy (e.g. mdcs, nmrr) |
-| PROJECT_VERSION       | Version of the CDCS image to deploy (e.g. latest, 2.10.0) |
+| PROJECT_NAME          | Name of the Docker image to deploy (e.g. mdcs, nmrr) |
+| PROJECT_VERSION       | Version of the Docker image to deploy (e.g. latest, 2.10.0) |
 | HOSTNAME              | Hostname of the server (e.g. for local deployment, use the machine's IP address xxx.xxx.xxx.xxx) |
 | SERVER_URI            | URI of server (e.g. for local deployment, http://xxx.xxx.xxx.xxx) |
 | SERVER_NAME           | Name of the server (e.g. MDCS) |
@@ -82,6 +82,7 @@ Commented variables in the `.env` need to be uncommented and filled.
 The deployment can be further customized by editing the `settings.py` file located under `deploy/cdcs`.
 The files are currently filled with default values for a deployment of an MDCS or an NMRR system.
 It is recommended to customize the file before deploying.
+Custom settings for WIPP-Registry are provided under `deploy/cdcs/wipp-registry.settings.py`.
 
 
 ## 2. Deploy the stack
@@ -107,11 +108,21 @@ $ ./docker_createsuperuser ${username} ${password} ${email}
 
 ## 4. Access
 
-The CDCS is now available at the `SERVER_URI` set at deployment.
+The WIPP Registry is now available at the `SERVER_URI` set at deployment.
 Please read important deployment information in the troubleshoot section below.
 
+## 5. Custom XSLT
 
-## 5. Troubleshoot
+A custom XSL template for the display of WIPP plugins is provided under `deploy/cdcs/wipp-registry-detail.xsl`.  
+The admin dashboard can be used to set this template as the default one in the registry:
+- As a admin user, click on "Admin" and "Administration" to access the admin dashboard,
+- On the left menu, select "XSLT List" and then click on the button "Upload XSLT",
+- Enter the following XSLT name: `wipp-registry-detail.xsl` and choose the file `wipp-registry-detail.xsl` provided in the `deploy/cdcs` folder,
+- On the left menu, select "Template List" and click on the "Versions" button of the active template,
+- Click on the "XSLT" button of the current template,
+- Under "Detail XSLT" choose `wipp-registry-detail.xsl` in the dropdown list and click on the "Save" button.
+
+## 6. Troubleshoot
 
 ## Local deployment
 
