@@ -75,6 +75,7 @@ services:
       - REDIS_PASS=${REDIS_PASS}
       - MONITORING_SERVER_URI=${MONITORING_SERVER_URI:-}
       - SERVER_NAME=${SERVER_NAME:-}
+      - SAML_METADATA_CONF_URL=${SAML_METADATA_CONF_URL:-}
     command:
       - nmrr
       - ${PROJECT_NAME}_cdcs_postgres

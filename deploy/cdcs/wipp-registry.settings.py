@@ -73,6 +73,7 @@ INSTALLED_APPS = (
     "tz_detect",
     "defender",
     "corsheaders",
+#    "django_saml2_auth", # Uncomment if using SAML auth
     # Core apps
     "core_main_app",
     "core_main_registry_app",
@@ -343,6 +344,29 @@ PASSWORD_MIN_NUMBERS = 0
 PASSWORD_MIN_SYMBOLS = 0
 # Specifies the maximum amount of consecutive characters allowed in passwords.
 PASSWORD_MAX_OCCURRENCE = None
+
+# SAML2 AUTH settings
+# Uncomment and configure if using SAML auth
+#SAML2_AUTH = {
+#    # Metadata is required, choose either remote url or local file path. Here an example is provided for Keycloak.
+#    'METADATA_AUTO_CONF_URL': os.environ["SAML_METADATA_CONF_URL"], 
+#    #'METADATA_LOCAL_FILE_PATH': '/srv/curator/federationmetadata.xml',
+# 
+#    # Optional settings below
+#    'DEFAULT_NEXT_URL': '/',  # Custom target redirect URL after the user get logged in. Default to /admin if not set. This setting will be overwritten if you have parameter ?next= specificed in the login URL.
+#    'CREATE_USER': False, # Create a new Django user when a new user logs in. Defaults to True.
+#    'ATTRIBUTES_MAP': {  # Change to corresponding SAML2 userprofile attributes. Here an example is provided for Keycloak, with email, first_name and last_name added from built-in Mappers in the client, and username as a custom Mapper.
+#        'email': 'urn:oid:1.2.840.113549.1.9.1',
+#        'username': 'urn:oid:0.9.2342.19200300.100.1.1',
+#        'first_name': 'urn:oid:2.5.4.42',
+#        'last_name': 'urn:oid:2.5.4.4',
+#    },
+#    'ASSERTION_URL': SERVER_URI, # Custom URL to validate incoming SAML requests against
+#    'ENTITY_ID': SERVER_URI + '/saml2_auth/acs/', # Populates the Issuer element in authn request
+#    'NAME_ID_FORMAT': 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient', # Sets the Format property of authn NameIDPolicy element
+#    'USE_JWT': False,
+#    'SAML_CLIENT_SETTINGS': False
+#}
 
 MENU_SELECT_PARENTS = False
 """ boolean: Control if parent menu items should automatically have their selected property set to True if one of 

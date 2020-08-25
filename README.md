@@ -25,7 +25,7 @@ Below is the list of environment variables to set and their description.
 | PROJECT_NAME          | Name of the Docker image to build |
 | PROJECT_VERSION       | Name of the Docker tag to build (e.g. latest, 2.10.0) |
 | CDCS_REPO             | URL of the CDCS-based repository to clone to build the image (e.g. https://github.com/usnistgov/WIPP-Registry.git) |
-| BRANCH                | Branch/Tag of the repository to pull to build the image (e.g. master, 2.10.0) |
+| BRANCH                | Branch/Tag of the repository to pull to build the image (wipp-registry or wipp-registry-saml for SMAL-based authentication) |
 | PIP_CONF              | Pip configuration file to use to build the image |
 | PYTHON_VERSION        | Version of the Python image to use as a base image for the CDCS image |
 
@@ -76,6 +76,7 @@ Commented variables in the `.env` need to be uncommented and filled.
 | POSTGRES_VERSION      | Version of the Postgres image |
 | NGINX_VERSION         | Version of the NGINX image |
 | MONITORING_SERVER_URI | (optional) URI of an APM server for monitoring |
+| SAML_METADATA_CONF_URL| (optional) URI of a SAML metadata configuration |
 
 #### Settings
 
@@ -83,6 +84,13 @@ The deployment can be further customized by editing the `settings.py` file locat
 The files are currently filled with default values for a deployment of an MDCS or an NMRR system.
 It is recommended to customize the file before deploying.
 Custom settings for WIPP-Registry are provided under `deploy/cdcs/wipp-registry.settings.py`.
+
+### SAML2 authentication
+
+For SAML-based authentication:
+- uncomment and set `SAML_METADATA_CONF_URL` variable in `.env` file
+- uncomment `django_saml2_auth` from the `INSTALLED_APPS` section in `deploy/cdcs/wipp-registry.settings.py`
+- uncomment and configure the `SAML2_AUTH` section in `deploy/cdcs/wipp-registry.settings.py`
 
 
 ## 2. Deploy the stack
@@ -103,7 +111,7 @@ main administrator on the platform. Once it has been created, more users
 can be added using the web interface. Wait for the CDCS server to start, then run:
 
 ```bash
-$ ./docker_createsuperuser ${username} ${password} ${email}
+$ ./docker_createsuperuser.sh ${username} ${password} ${email}
 ```
 
 ## 4. Access
