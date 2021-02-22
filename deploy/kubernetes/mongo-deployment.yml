@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: curator-mongo
+  name: curator-mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: curator-mongo
+  template:
+    metadata:
+      labels:
+        app: curator-mongo
+    spec:
+      containers:
+        - args:
+            - --auth
+          env:
+            - name: MONGO_INITDB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret-config
+                  key: mongo_db_name
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret-config
+                  key: mongo_admin_pass
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret-config
+                  key: mongo_admin_user
+            - name: MONGO_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret-config
+                  key: mongo_pass
+            - name: MONGO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret-config
+                  key: mongo_user
+          image: mongo:4.0.3
+          name: wipp-registry-cdcs-mongo
+          volumeMounts:
+            - mountPath: /data/db
+              name: mongo-data
+            - mountPath: /docker-entrypoint-initdb.d/mongo-init.sh
+              name: curator-mongo-init
+              subPath: mongo-init.sh
+      restartPolicy: Always
+      volumes:
+        - name: mongo-data
+          persistentVolumeClaim:
+            claimName: mongo-pv-claim
+        - name: curator-mongo-init
+          configMap:
+              name: mongo-init-config
+              items:
+              - key: mongo-init.sh
+                path: mongo-init.sh

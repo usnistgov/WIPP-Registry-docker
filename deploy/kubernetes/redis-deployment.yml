@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: curator-redis
+  name: curator-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: curator-redis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: curator-redis
+    spec:
+      containers:
+        - env:
+            - name: REDIS_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret-config
+                  key: redis_pass
+          command: [ "redis-server", "--requirepass", "$(REDIS_PASS)" ]
+          image: redis:5.0
+          name: curator-redis
+          volumeMounts:
+            - mountPath: /data
+              name: redis-data
+      restartPolicy: Always
+      volumes:
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: redis-pv-claim

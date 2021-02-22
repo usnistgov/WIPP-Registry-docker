@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: curator-postgres
+  name: curator-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: curator-postgres
+  template:
+    metadata:
+      labels:
+        app: curator-postgres
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret-config
+                  key: postgres_db_name
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret-config
+                  key: postgres_pass
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret-config
+                  key: postgres_user
+          image: postgres:9.6
+          name: curator-postgres
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-data
+      restartPolicy: Always
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim

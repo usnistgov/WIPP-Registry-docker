@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cdcs
+  name: cdcs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cdcs
+  template:
+    metadata:
+      labels:
+        app: cdcs
+    spec:
+      containers:
+        - name: wipp-registry-cdcs
+          image: wipp-registry:1.0.0
+          args: [ "nmrr", "$(POSTGRES_HOST)", "$(POSTGRES_DB)", "$(POSTGRES_USER)", "$(POSTGRES_PASS)"]
+
+        - name: wipp-registry-cdcs-nginx
+          image: nginx:1.12
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+
+          env:
+            - name: HOSTNAME
+              value: 127.0.0.1
+            - name: REDIS_HOST
+              value: curator-redis
+            - name: MONGO_HOST
+              value: curator-mongo
+            - name: POSTGRES_HOSTs
+              value: curator-postgres
+            - name: DJANGO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: django-secret-config
+                  key: django_secret_key
+            - name: DJANGO_SETTINGS_MODULE
+              value: nmrr.settings
+            - name: MONGO_DB
+              value: mongo
+            - name: MONGO_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret-config
+                  key: mongo_pass
+            - name: MONGO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret-config
+                  key: mongo_user
+            - name: MONITORING_SERVER_URI
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret-config
+                  key: postgres_db_name
+            - name: POSTGRES_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret-config
+                  key: postgres_pass
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret-config
+                  key: postgres_user
+            - name: REDIS_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret-config
+                  key: redis_pass
+            - name: SAML_METADATA_CONF_URL
+            - name: SERVER_NAME
+              value: NIST-WIPP
+            - name: SERVER_URI
+              value: http://127.0.0.1
+
+          volumeMounts:
+            - mountPath: /tmp/curator
+              name: cdcs-socket-volume
+            - mountPath: /srv/curator/static.prod
+              name: cdcs-static-volume
+            - mountPath: /etc/nginx/nginx.conf
+              name: nginx-config
+              subPath: nginx.conf  
+            - mountPath: /etc/nginx/conf.d/default.conf
+              name: nginx-config-default
+              subPath: default.conf
+            - mountPath: /srv/curator/nmrr/settings.py
+              name: cdcs-config-volume
+              subPath: settings.py
+
+      volumes:
+        - name: cdcs-socket-volume
+          persistentVolumeClaim:
+            claimName: cdcs-socket-claim
+        - name: cdcs-static-volume
+          persistentVolumeClaim:
+            claimName: cdcs-static-claim
+        - name: nginx-config
+          configMap:
+              name: nginx-config
+              items:
+              - key: nginx.conf
+                path: nginx.conf
+        - name: nginx-config-default
+          configMap:
+              name: nginx-config
+              items:
+              - key: default.conf
+                path: default.conf
+        - name: cdcs-config-volume
+          configMap:
+              name: cdcs-config
+              items:
+              - key: wipp-registry.settings.py
+                path: wipp-registry.settings.py
