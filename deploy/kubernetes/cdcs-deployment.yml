@@ -14,25 +14,42 @@ spec:
       labels:
         app: cdcs
     spec:
+      volumes:
+        - name: cdcs-socket-volume
+          emptyDir:
+            sizeLimit: 200M
+        - name: cdcs-static-volume
+          emptyDir:
+            sizeLimit: 100M
+        - name: nginx-config
+          configMap:
+              name: nginx-config
+              items:
+              - key: nginx.conf
+                path: nginx.conf
+        - name: nginx-config-default
+          configMap:
+              name: nginx-config
+              items:
+              - key: default.conf
+                path: default.conf
+        - name: cdcs-config-volume
+          configMap:
+              name: cdcs-config
+              items:
+              - key: settings.py
+                path: settings.py
+
       containers:
         - name: wipp-registry-cdcs
           image: wipp-registry:1.0.0
           args: [ "nmrr", "$(POSTGRES_HOST)", "$(POSTGRES_DB)", "$(POSTGRES_USER)", "$(POSTGRES_PASS)"]
-
-        - name: wipp-registry-cdcs-nginx
-          image: nginx:1.12
-          ports:
-            - containerPort: 80
-            - containerPort: 443
-
           env:
-            - name: HOSTNAME
-              value: 127.0.0.1
             - name: REDIS_HOST
               value: curator-redis
             - name: MONGO_HOST
               value: curator-mongo
-            - name: POSTGRES_HOSTs
+            - name: POSTGRES_HOST
               value: curator-postgres
             - name: DJANGO_SECRET_KEY
               valueFrom:
@@ -79,44 +96,36 @@ spec:
               value: NIST-WIPP
             - name: SERVER_URI
               value: http://127.0.0.1
-
           volumeMounts:
-            - mountPath: /tmp/curator
-              name: cdcs-socket-volume
-            - mountPath: /srv/curator/static.prod
-              name: cdcs-static-volume
-            - mountPath: /etc/nginx/nginx.conf
-              name: nginx-config
-              subPath: nginx.conf  
-            - mountPath: /etc/nginx/conf.d/default.conf
-              name: nginx-config-default
-              subPath: default.conf
-            - mountPath: /srv/curator/nmrr/settings.py
-              name: cdcs-config-volume
+            - name: cdcs-socket-volume
+              mountPath: /tmp/curator
+            - name: cdcs-static-volume
+              mountPath: /srv/curator/static.prod
+              
+            - name: cdcs-config-volume
+              mountPath: /srv/curator/nmrr/settings.py
               subPath: settings.py
 
-      volumes:
-        - name: cdcs-socket-volume
-          persistentVolumeClaim:
-            claimName: cdcs-socket-claim
-        - name: cdcs-static-volume
-          persistentVolumeClaim:
-            claimName: cdcs-static-claim
-        - name: nginx-config
-          configMap:
-              name: nginx-config
-              items:
-              - key: nginx.conf
-                path: nginx.conf
-        - name: nginx-config-default
-          configMap:
-              name: nginx-config
-              items:
-              - key: default.conf
-                path: default.conf
-        - name: cdcs-config-volume
-          configMap:
-              name: cdcs-config
-              items:
-              - key: wipp-registry.settings.py
-                path: wipp-registry.settings.py
+              
+        - name: nginx
+          image: nginx:1.12
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+          env:
+            - name: HOSTNAME
+              value: 127.0.0.1
+          volumeMounts:
+            - name: cdcs-socket-volume
+              mountPath: /tmp/curator
+            - name: cdcs-static-volume
+              mountPath: /srv/curator/static.prod
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf  
+            - name: nginx-config-default
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+
+
+

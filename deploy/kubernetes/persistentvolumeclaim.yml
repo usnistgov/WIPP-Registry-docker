@@ -44,8 +44,6 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: cdcs-static-claim
-  labels:
-    app: curator-nginx-static
 spec:
   storageClassName: manual
   accessModes:
@@ -58,8 +56,6 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: cdcs-socket-claim
-  labels:
-    app: curator-nginx-socket
 spec:
   storageClassName: manual
   accessModes:

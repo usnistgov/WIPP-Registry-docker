@@ -46,4 +46,4 @@ spec:
     - name: curator-nginx-https
       port: 443
   selector:
-    app: curator-nginx
+    app: cdcs

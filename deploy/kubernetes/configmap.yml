@@ -52,25 +52,26 @@ data:
 
   default.conf: |
     upstream curator {
-    server unix:///tmp/curator/curator.sock;
+        server unix:///tmp/curator/curator.sock;
     }
 
     server {
-      charset utf-8;
-      listen 80 default_server;
-      listen [::]:80 default_server;
+    charset utf-8;
+    listen 80 default_server;
+    listen [::]:80 default_server;
 
-      location / {
+    location / {
         include /etc/nginx/uwsgi_params;
         uwsgi_pass curator;
         uwsgi_read_timeout 120s;
-      }
+    }
 
         location /static {
             autoindex off;
-            alias /srv/curator_static;
+            alias /srv/curator/static.prod;
         }
     }
+
 
 ---
 apiVersion: v1
@@ -96,7 +97,7 @@ kind: ConfigMap
 metadata:
   name: cdcs-config
 data:
-  wipp-registry.settings.py: |
+  settings.py: |
     """
     Django settings for the nmrr project.
 

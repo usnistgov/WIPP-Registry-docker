@@ -15,29 +15,41 @@ spec:
         app: curator-postgres
     spec:
       containers:
-        - env:
-            - name: POSTGRES_DB
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-secret-config
-                  key: postgres_db_name
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-secret-config
-                  key: postgres_pass
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-secret-config
-                  key: postgres_user
-          image: postgres:9.6
+        - image: postgres:9.6
           name: curator-postgres
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgres-data
-      restartPolicy: Always
+          env:
+            - name: POSTGRES_DB
+              value: "postgres"
+              # valueFrom:
+              #   secretKeyRef:
+              #     name: postgres-secret-config
+              #     key: postgres_db_name
+            - name: POSTGRES_PASSWORD
+              value: "post123"
+              # valueFrom:
+              #   secretKeyRef:
+              #     name: postgres-secret-config
+              #     key: postgres_pass
+            - name: POSTGRES_USER
+              value: "postgres"
+              # valueFrom:
+              #   secretKeyRef:
+              #     name: postgres-secret-config
+              #     key: postgres_user
+
+        - name: busybox
+          image: busybox:latest
+          command: ["sleep", "999999"]
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-data
+
+
       volumes:
         - name: postgres-data
           persistentVolumeClaim:
             claimName: postgres-pv-claim
+          
