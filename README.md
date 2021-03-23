@@ -7,7 +7,9 @@ This repository contains `docker-compose` files to build and deploy CDCS contain
 Install [Docker](https://docs.docker.com/engine/install/#server) first, then install [Docker Compose](https://docs.docker.com/compose/install/).
 
 
-## Build a CDCS image
+## Build a CDCS image (optional)
+
+WIPP-Registry Docker images are available on DockerHub, but you can build your own images with following instructions:
 
 ### 1. Customize the build
 
@@ -55,13 +57,13 @@ and filled.
 
 | Variable | Description |
 | ----------- | ----------- |
-| PROJECT_NAME          | Name of the CDCS/Django project to deploy (e.g. mdcs, nmrr) |
-| IMAGE_NAME            | Name of the CDCS image to deploy (e.g. wipp-registry) |
-| IMAGE_VERSION         | Version of the CDCS image to deploy (e.g. latest, 1.1.0) |
+| PROJECT_NAME          | Name of the CDCS/Django project to deploy (e.g. nmrr) |
+| IMAGE_NAME            | Name of the CDCS image to deploy (e.g. wipp/wipp-registry) |
+| IMAGE_VERSION         | Version of the CDCS image to deploy (e.g. 1.1.0, 1.1.0-saml) |
 | HOSTNAME              | Hostname of the server (e.g. for local deployment, use the machine's IP address xxx.xxx.xxx.xxx) |
 | SERVER_URI            | URI of server (e.g. for local deployment, http://xxx.xxx.xxx.xxx) |
 | ALLOWED_HOSTS         | Comma-separated list of hosts (e.g. ALLOWED_HOSTS=127.0.0.1,localhost), see [Allowed Hosts](https://docs.djangoproject.com/en/2.2/ref/settings/#allowed-hosts) |
-| SERVER_NAME           | Name of the server (e.g. MDCS) |
+| SERVER_NAME           | Name of the server, used to distinguish instances in federated queries (e.g. {INSTITUTION}-WIPP or {INSTITUTION}-{CUSTOM-WIPP-NAME}) |
 | SETTINGS              | Settings file to use during deployment ([more info in the Settings section](#settings))|
 | SERVER_CONF           | Mount appropriate nginx file (e.g. default for http, https otherwise. The protocol of the `SERVER_URI` should be updated accordingly) |
 | MONGO_PORT            | MongoDB Port (default: 27017) |
@@ -85,7 +87,16 @@ and filled.
 | NGINX_VERSION         | Version of the NGINX image |
 | MONITORING_SERVER_URI | (optional) URI of an APM server for monitoring |
 | SAML_METADATA_CONF_URL| (optional) URI of a SAML metadata configuration |
-
+| SAML_CREATE_USER      | (optional) Determines if a new Django user should be created for new users |
+| SAML_ATTRIBUTES_MAP_EMAIL| (optional) Mapping of Django user attributes to SAML2 user attribute - email |
+| SAML_ATTRIBUTES_MAP_USERNAME| (optional) Mapping of Django user attributes to SAML2 user attribute - username |
+| SAML_ATTRIBUTES_MAP_FIRSTNAME| (optional) Mapping of Django user attributes to SAML2 user attribute - firstname |
+| SAML_ATTRIBUTES_MAP_LASTNAME| (optional) Mapping of Django user attributes to SAML2 user attribute - lastname |
+| SAML_ASSERTION_URL| (optional) A URL to validate incoming SAML responses against |
+| SAML_ENTITY_ID| (optional) The optional entity ID string to be passed in the 'Issuer' element of authn request, if required by the IDP |
+| SAML_NAME_ID_FORMAT| (optional) Set to the string 'None', to exclude sending the 'Format' property of the 'NameIDPolicy' element in authn requests. Default value if not specified is 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient' |
+| SAML_USE_JWT| (optional) JWT authentication - False |
+| SAML_CLIENT_SETTINGS| (optional) Client settings - False |
 A few additional environment variables are provided to the CDCS
 container. The variables below are computed based on the values of
 other variables. If changed, some portions of the `docker-compose.yml`
@@ -105,31 +116,18 @@ have settings ready for deployment (not production).
 
 The deployment can be further customized by mounting additional settings
 to the deployed containers:
-- **Option 1:** Use settings from the image. This option is recommended
+- **Option 1 (default):** Use settings from the image. This option is recommended
 if the settings in your image are already well formatted for deployment.
-    - Update the `docker-compose.yml` file and comment the line that
-    mounts the settings:
-    ```
-    # - ./cdcs/${SETTINGS}.py:/srv/curator/nmrr/${SETTINGS}.py
-    ```
     - set the `SETTINGS` variable to `settings`.
 - **Option 2**: Use default settings from the CDCS image and customize
-them. Custom settings can be used to provide CI or production
-configurations. For example:
-    - Create a `custom_settings.py` file (see `ci_settings.py` or
-     `test_settings.py` as examples),
+them. Custom settings can be used to override default settings or add additional settngs. For example:
+    - Create a `custom_settings.py` file (see `ci_settings.py` as example),
+    - Update the `docker-compose.yml` file and uncomment the line that
+        mounts the settings:
+        ```
+        # - ./cdcs/${SETTINGS}.py:/srv/curator/nmrr/${SETTINGS}.py
+        ```
     - set the `SETTINGS` variable to `custom_settings`.
-- **Option 3**: Override settings from the image. This will
-ignore settings already present in the CDCS image. This option is
-recommended for MDCS/NMRR 2.14 and below.
-    - Update the `docker-compose.yml` file and change the line that
-    mounts the settings to:
-    ```
-    - ./cdcs/wipp-registry.settings.py:/srv/curator/nmrr/settings.py
-    ```
-    - set the `SETTINGS` variable to `settings`.
-
-Custom settings for WIPP-Registry are provided under `deploy/cdcs/wipp-registry.settings.py`.
 
 The [`DJANGO_SETTINGS_MODULE`](https://docs.djangoproject.com/en/2.2/topics/settings/#envvar-DJANGO_SETTINGS_MODULE)
 environment variable can be set to select which settings to use. By
@@ -142,9 +140,9 @@ please check the [Deployment Checklist](https://docs.djangoproject.com/en/2.2/ho
 ### SAML2 authentication
 
 For SAML-based authentication:
-- uncomment and set `SAML_METADATA_CONF_URL` variable in `.env` file
-- uncomment `django_saml2_auth` from the `INSTALLED_APPS` section in `deploy/cdcs/wipp-registry.settings.py`
-- uncomment and configure the `SAML2_AUTH` section in `deploy/cdcs/wipp-registry.settings.py`
+- uncomment and set `SAML_*` variables in `.env` file
+- change the `IMAGE_VERSION` variable in `.env` file from `wipp/wipp-registry:{version}` to `wipp/wipp-registry:{version}-saml` 
+(e.g. `wipp/wipp-registry:1.1.0-saml`)
 
 ## 2. Deploy the stack
 

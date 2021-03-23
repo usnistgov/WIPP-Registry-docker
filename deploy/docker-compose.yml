@@ -58,7 +58,7 @@ services:
     volumes:
       - cdcs_socket:/tmp/curator/
       - cdcs_static:/srv/curator/static.prod
-      - ./cdcs/${SETTINGS}.py:/srv/curator/nmrr/${SETTINGS}.py
+      #- ./cdcs/${SETTINGS}.py:/srv/curator/nmrr/${SETTINGS}.py
     environment:
       - DJANGO_SETTINGS_MODULE=nmrr.${SETTINGS}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
@@ -80,6 +80,16 @@ services:
       - REDIS_PASS=${REDIS_PASS}
       - MONITORING_SERVER_URI=${MONITORING_SERVER_URI:-}
       - SAML_METADATA_CONF_URL=${SAML_METADATA_CONF_URL:-}
+      - SAML_CREATE_USER=${SAML_CREATE_USER:-}
+      - SAML_ATTRIBUTES_MAP_EMAIL=${SAML_ATTRIBUTES_MAP_EMAIL:-}
+      - SAML_ATTRIBUTES_MAP_USERNAME=${SAML_ATTRIBUTES_MAP_USERNAME:-}
+      - SAML_ATTRIBUTES_MAP_FIRSTNAME=${SAML_ATTRIBUTES_MAP_FIRSTNAME:-}
+      - SAML_ATTRIBUTES_MAP_LASTNAME=${SAML_ATTRIBUTES_MAP_LASTNAME:-}
+      - SAML_ASSERTION_URL=${SAML_ASSERTION_URL:-}
+      - SAML_ENTITY_ID=${SAML_ENTITY_ID:-}
+      - SAML_NAME_ID_FORMAT=${SAML_NAME_ID_FORMAT:-}
+      - SAML_USE_JWT=${SAML_USE_JWT:-}
+      - SAML_CLIENT_SETTINGS=${SAML_CLIENT_SETTINGS:-}
     command:
       - nmrr
 

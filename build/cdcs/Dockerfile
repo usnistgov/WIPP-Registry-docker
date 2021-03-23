@@ -22,8 +22,8 @@ RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" \
 RUN mkdir -p /root/.config/pip
 COPY pip/$PIP_CONF/pip.conf /root/.config/pip
 
-# Install uwsgi
-RUN pip install uwsgi psycopg2
+# Install uwsgi and gunicorn
+RUN pip install uwsgi psycopg2 gunicorn
 
 # Clone git repo
 RUN git clone $CDCS_REPO $DOCKYARD_SRVPROJ
@@ -36,8 +36,8 @@ RUN pip install -r requirements.txt
 RUN pip install -r requirements.core.txt
 
 # Get entrypoint ready for the image
-COPY ./docker-entrypoint.sh /
-RUN chmod +x /docker-entrypoint.sh
+COPY ./docker-entrypoint*.sh /
+RUN chmod +x /docker-entrypoint*.sh
 
 # Create folder for uwsgi socket
 RUN mkdir /tmp/curator
