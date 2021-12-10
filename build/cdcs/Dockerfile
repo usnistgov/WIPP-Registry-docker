@@ -23,7 +23,7 @@ RUN mkdir -p /root/.config/pip
 COPY pip/$PIP_CONF/pip.conf /root/.config/pip
 
 # Install uwsgi and gunicorn
-RUN pip install uwsgi psycopg2 gunicorn
+RUN pip install uwsgi psycopg2==2.8.6 gunicorn
 
 # Clone git repo
 RUN git clone $CDCS_REPO $DOCKYARD_SRVPROJ

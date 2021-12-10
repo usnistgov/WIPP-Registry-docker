@@ -18,5 +18,6 @@ echo "********* Compile messages... *********"
 /srv/curator/manage.py compilemessages
 
 echo "********* Starting Celery worker... *********"
-celery worker -E --app=$PROJECT_NAME -l info -B &
+celery -A $PROJECT_NAME worker -E -l info &
+celery -A $PROJECT_NAME beat -l info &
 
