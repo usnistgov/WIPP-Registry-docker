@@ -87,17 +87,7 @@ and filled.
 | NGINX_VERSION         | Version of the NGINX image |
 | UWSGI_PROCESSES       | Number of uwsgi processes to start (default 10) |
 | MONITORING_SERVER_URI | (optional) URI of an APM server for monitoring |
-| SAML_METADATA_CONF_URL| (optional) URI of a SAML metadata configuration |
-| SAML_CREATE_USER      | (optional) Determines if a new Django user should be created for new users |
-| SAML_ATTRIBUTES_MAP_EMAIL| (optional) Mapping of Django user attributes to SAML2 user attribute - email |
-| SAML_ATTRIBUTES_MAP_USERNAME| (optional) Mapping of Django user attributes to SAML2 user attribute - username |
-| SAML_ATTRIBUTES_MAP_FIRSTNAME| (optional) Mapping of Django user attributes to SAML2 user attribute - firstname |
-| SAML_ATTRIBUTES_MAP_LASTNAME| (optional) Mapping of Django user attributes to SAML2 user attribute - lastname |
-| SAML_ASSERTION_URL| (optional) A URL to validate incoming SAML responses against |
-| SAML_ENTITY_ID| (optional) The optional entity ID string to be passed in the 'Issuer' element of authn request, if required by the IDP |
-| SAML_NAME_ID_FORMAT| (optional) Set to the string 'None', to exclude sending the 'Format' property of the 'NameIDPolicy' element in authn requests. Default value if not specified is 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient' |
-| SAML_USE_JWT| (optional) JWT authentication - False |
-| SAML_CLIENT_SETTINGS| (optional) Client settings - False |
+
 A few additional environment variables are provided to the CDCS
 container. The variables below are computed based on the values of
 other variables. If changed, some portions of the `docker-compose.yml`
