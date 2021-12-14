@@ -223,12 +223,6 @@ default the `docker-compose` file sets it using the values of
 For more information about production deployment of a Django project,
 please check the [Deployment Checklist](https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/#deployment-checklist)
 
-### SAML2 authentication
-
-For SAML-based authentication:
-- uncomment and set `SAML_*` variables in `.env` file
-- change the `IMAGE_VERSION` variable in `.env` file from `wipp/wipp-registry:{version}` to `wipp/wipp-registry:{version}-saml` 
-(e.g. `wipp/wipp-registry:1.1.0-saml`)
 
 ## 2. Deploy the stack
 
