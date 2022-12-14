@@ -14,16 +14,14 @@ ENV DOCKYARD_SRVPROJ="/srv/curator"
 RUN apt-get update && apt-get install -y \
     netcat vim python curl git dnsutils gettext \
     libxml2-dev libxslt-dev python-dev lib32z1-dev libssl-dev \
-    postgresql-client xmlsec1
+    python3-pip libpq-dev postgresql-client xmlsec1
 
 # Setup pip
-RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" \
-    && python get-pip.py
 RUN mkdir -p /root/.config/pip
 COPY pip/$PIP_CONF/pip.conf /root/.config/pip
 
 # Install uwsgi and gunicorn
-RUN pip install uwsgi psycopg2==2.8.6 gunicorn
+RUN pip install uwsgi psycopg2 gunicorn
 
 # Clone git repo
 RUN git clone $CDCS_REPO $DOCKYARD_SRVPROJ
@@ -34,6 +32,7 @@ RUN cd $DOCKYARD_SRVPROJ \
 WORKDIR $DOCKYARD_SRVPROJ
 RUN pip install -r requirements.txt
 RUN pip install -r requirements.core.txt
+RUN pip install "importlib-metadata<5.0.0"
 
 # Get entrypoint ready for the image
 COPY ./docker-entrypoint*.sh /
@@ -43,6 +42,8 @@ RUN chmod +x /docker-entrypoint*.sh
 RUN mkdir /tmp/curator
 # Create folder for static files
 RUN mkdir $DOCKYARD_SRVPROJ/static.prod
+# Create folder for media files
+RUN mkdir $DOCKYARD_SRVPROJ/media
 
 # Create unprivileged user
 RUN groupadd cdcs && \
