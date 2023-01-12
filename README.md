@@ -195,6 +195,32 @@ ORGANIZATION_URL_1=http://example.com,en
 ORGANIZATION_URL_2=http://exemple.se,se
 ```
 
+#### hdl.net PID Integration
+
+CDCS supports integration of a hdl.net server to issue and resolve PIDs for
+data and blobs. This requires some setting of environment variables at deploy
+time to configure effectively. Please see the file
+`./deploy/handle/.env.example` for more details.
+
+| Variable                             | Description                                                                                                                                                                                                                                                                                                                           |
+|--------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `ENABLE_HANDLE_PID`                  | Controls whether CDCS is configured to use a handle server for PIDs. If so, all the values below should be set to values specific for your handle server config (contact your handle server administrator for any help). If you enable Handle integration but don't set these values correctly; it's _very_ likely things won't work. |
+| `HANDLE_NET_LOOKUP_URL`              | The URL of the handle server to display links (e.g. https://hdl.handle.net)                                                                                                                                                                                                                                                           |
+| `HANDLE_NET_REGISTRATION_URL`        | The URL of the handle server for registering records (e.g. https://my-handle-net.domain)                                                                                                                                                                                                                                              |
+| `ID_PROVIDER_PREFIXES`               | Prefixes to use when creating handles for data and blobs in CDCS. Comma-separated values.                                                                                                                                                                                                                                             |
+| `HANDLE_NET_USER`                    | Handle server authentication for a user that has admin rights to list and create handles on the provided prefix. The value provided here will be encoded as "300:{HANDLE_NET_PREFIX}/{HANDLE_NET_USER}" when it is sent to the handle server, so this value should be just the suffix of the admin handle                             |
+| `HANDLE_NET_SECRET_KEY`              | The "secret key" for the admin user specified above. This should be provided as plain text and not encoded in any way. This value corresponds to the secret key that would be used if you were creating a handle via batch file                                                                                                       |
+| `PID_XPATH`                          | The location in the default schema in which to store and search for PID values. Should be provided in "dot" notation, with attributes indicated using the "@" character. For example, if your PIDs are stored in an attribute named "pid" on the root element named "Resource", the PID_XPATH value should be "Resource.@pid"         |
+| `AUTO_SET_PID`                       | Whether to auto-create PIDs for records that are curated or uploaded without them. Should likely be True if you're using PIDs at all                                                                                                                                                                                                  |
+| `HANDLE_NET_RECORD_INDEX`            | Starting index for records when minting handles                                                                                                                                                                                                                                                                                       |
+|                                      | _The following are admin settings for the handle config. The default values are probably fine, but they should match any example batch files you have for creating handles on your handle server_                                                                                                                                     |
+| `HANDLE_NET_ADMIN_INDEX`             | The admin index value (default: `100`)                                                                                                                                                                                                                                                                                                |
+| `HANDLE_NET_ADMIN_TYPE`              | The admin type (default: `HS_ADMIN`)                                                                                                                                                                                                                                                                                                  |
+| `HANDLE_NET_ADMIN_DATA_FORMAT`       | The admin data format (default: `admin`)                                                                                                                                                                                                                                                                                              |
+| `HANDLE_NET_ADMIN_DATA_INDEX`        | The admin data index value (default: `200`)                                                                                                                                                                                                                                                                                           |
+| `HANDLE_NET_ADMIN_DATA_PERMISSIONS`  | The admin data permissions (default: `011111110011`)                                                                                                                                                                                                                                                                                  |
+
+
 #### Settings
 
 Starting from MDCS/NMRR 2.14, repositories of these two projects will
@@ -344,6 +370,18 @@ Additional components can be added to the CDCS stack by providing `docker-compos
 Update the `COMPOSE_FILE` variable in the `.env` file to do so. More information can be found in on this option in the
 [documentation](https://docs.docker.com/compose/reference/envvars/#compose_file).
 
+### MongoDB
+
+In preparation for the release of CDCS 3.x, MongoDB becomes an optional component and 
+will not be part of the default stack. It will need to be added for any CDCS 2.x deployment.
+
+To add MongoDB to the CDCS stack, you can do the following:
+
+Update the `.env` file to deploy MongoDB:
+```
+COMPOSE_FILE=docker-compose.yml:mongo/docker-compose.yml
+```
+
 ### Elasticsearch
 
 Ongoing developments on the CDCS make use of Elasticsearch.
@@ -358,7 +396,7 @@ Add and fill the following environment variables:
 
 | Variable | Description |
 | ----------- | ----------- |
-| ELASTIC_VERSION          | Version of the Elasticsearch image (e.g. 7.14.1) |
+| ELASTIC_VERSION          | Version of the Elasticsearch image (e.g. 7.16.2) |
 
 On linux, you will need to increase the available [virtual memory](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/vm-max-map-count.html).
 
